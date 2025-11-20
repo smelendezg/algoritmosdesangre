@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request 
 import pandas as pd
 import math
 from sklearn.cluster import KMeans
@@ -210,11 +210,18 @@ def run():
                 X = num_df_ajustado.values
 
             try:
-                etiquetas = KMeans(n_clusters=k, random_state=42, n_init=10).fit_predict(X)
+                modelo = KMeans(n_clusters=k, random_state=42, n_init=10)
+                etiquetas = modelo.fit_predict(X)
             except Exception as e:
                 return f"Error al ejecutar K-Medias: {e}"
 
-            df["cluster"] = etiquetas
+            centros = modelo.cluster_centers_.flatten()
+            orden = np.argsort(centros)
+            nuevo_cluster = {orden[i]: i for i in range(len(orden))}
+            etiquetas_ordenadas = np.array([nuevo_cluster[e] for e in etiquetas])
+
+            df["cluster"] = etiquetas_ordenadas
+
             table_html = df.head(50).to_html(index=False)
 
             return render_template(
@@ -230,7 +237,18 @@ def run():
             except Exception as e:
                 return f"Error al ejecutar K-Modas: {e}"
 
-            df["cluster"] = etiquetas
+            if "Clase" in df.columns:
+                centros = km.cluster_centroids_
+                idx_clase = df.columns.get_loc("Clase")
+                modos = np.array([c[idx_clase] for c in centros])
+                orden = np.argsort(modos)
+                nuevo_cluster = {orden[i]: i for i in range(len(orden))}
+                etiquetas_ordenadas = np.array([nuevo_cluster[e] for e in etiquetas])
+            else:
+                etiquetas_ordenadas = etiquetas
+
+            df["cluster"] = etiquetas_ordenadas
+
             table_html = df.head(50).to_html(index=False)
 
             return render_template(
