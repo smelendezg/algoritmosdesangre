@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ titulo }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/resultado.css') }}">
+</head>
+
+<body>
+  <div class="card">
+    <h1>{{ titulo }}</h1>
+
+    {% if metricas %}
+    <div class="metrics">
+      {% for metrica in metricas %}
+      <div class="metric-card {{ metrica.type }}">
+        <div class="metric-label">{{ metrica.label }}</div>
+        <div class="metric-value">{{ metrica.value }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if info %}
+    <div class="info-box">
+      {{ info }}
+    </div>
+    {% endif %}
+
+    {% if tabla_intervalos %}
+    <h2>Resumen de Intervalos</h2>
+    <div class="table-container">
+      {{ tabla_intervalos|safe }}
+    </div>
+    {% endif %}
+
+    {% if tabla_stats %}
+    <h2> Distribución por Cluster</h2>
+    <div class="table-container">
+      {{ tabla_stats|safe }}
+    </div>
+    {% endif %}
+
+    {% if reglas_texto %}
+      <h2>Reglas del árbol</h2>
+      <pre class="rules-text">{{ reglas_texto }}</pre>
+    {% endif %}
+
+    {% if tabla_pred_faltantes %}
+      <h2>Predicciones para filas con conclusión desconocida</h2>
+      <div class="table-container">
+        {{ tabla_pred_faltantes|safe }}
+      </div>
+    {% endif %}
+
+    {% if img_arbol %}
+      <h2>Árbol de decisión</h2>
+      <div class="tree-container">
+        <img src="data:image/png;base64,{{ img_arbol }}" alt="Árbol de decisión">
+      </div>
+    {% endif %}
+
+    {% if tabla_principal and algoritmo != 'arbol' %}
+      <h2>Muestra de Datos</h2>
+      <div class="table-container">
+        {{ tabla_principal|safe }}
+      </div>
+    {% endif %}
+
+    <div class="button-group">
+      <button class="btn btn-primary" onclick="window.location.href='/'">
+         Nuevo Análisis
+      </button>
+      <button class="btn btn-secondary" onclick="window.print()">
+         Imprimir Resultados
+      </button>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Análisis de Sangre</title>
+</head>
+<body>
+    <div class="card">
+    <h1>Algoritmos de sangre</h1>
+    
+    {% if error %}
+      <div class="alert error">
+        {{ error }}
+      </div>
+    {% endif %}
+
+    <form action="/ejecutar" method="post" enctype="multipart/form-data" id="mainForm">
+      
+      <div class="form-section">
+        <label class="required">Archivo CSV:</label>
+        <input type="file" name="file" accept=".csv" required>
+        <span class="help-text">Selecciona un archivo CSV con tus datos</span>
+
+        <label class="required">Algoritmo:</label>
+        <select name="algorithm" id="algorithm" required>
+          <option value="">-- Seleccione un algoritmo --</option>
+          <option value="kmedias">K-Medias</option>
+          <option value="kmodas">K-Modas</option>
+          <option value="chiagrup">Chi-Agrupamiento (Chi-Merge)</option>
+          <option value="arbol">Árbol de decisiones</option>
+          <option value="soloajuste">Solo normalizar datos</option>
+        </select>
+      </div>
+      
+      <div class="form-section hidden" id="ajusteSection">
+        <label>Tipo de ajuste (normalización):</label>
+        <select name="ajuste" id="ajuste">
+          <option value="ninguno">Sin ajuste</option>
+          <option value="lineal">Ajuste lineal</option>
+          <option value="z">Ajuste Z</option>
+          <option value="log">Ajuste logarítmico</option>
+        </select>
+        <span class="help-text">Aplica solo a columnas numéricas</span>
+      </div>
+
+      <div class="form-section hidden" id="clusteringSection">
+        <label>Número de clusters (K):</label>
+        <input type="number" name="n_clusters" id="n_clusters" min="2" placeholder="Auto si lo dejas vacío">
+      
+        <label>Columna que define el grupo:</label>
+        <input type="text" name="col_grupo" id="col_grupo" placeholder="Ej: Clase">
+        <span class="help-text">
+          Si la dejas vacía, el algoritmo crea los clusters automáticamente.
+        </span>
+
+        <label>Columna numérica principal:</label>
+        <input type="text" name="col_valor" id="col_valor" placeholder="Ej: X1">
+      </div>
+      
+      <div class="form-section hidden" id="chiSection">
+        <label class="required">Columna atributo (numérica):</label>
+        <input type="text" name="chi_col_atributo" id="chi_col_atributo" placeholder="Ej: X1">
+        <span class="help-text">
+          Debe ser una columna numérica del CSV (la que quieres discretizar).
+        </span>
+        
+        <label class="required">Columna de clase:</label>
+        <input type="text" name="chi_col_clase" id="chi_col_clase" placeholder="Ej: Clase">
+        <span class="help-text">
+          Variable de clase.
+        </span>
+
+        <label>Umbral χ² (chi-cuadrado):</label>
+        <input type="number" step="0.01" name="chi_umbral" id="chi_threshold" placeholder="Ej: 3.84">
+        <span class="help-text">Deja vacío para α=0.05 (recomendado)</span>
+        
+        <div class="info-box">
+          Se usará la primera columna numérica y la primera categórica del archivo.
+        </div>
+
+        <div class="info-box">
+          Debe escribir el nombre exacto de la columna atributo (numérica) 
+          y de la columna de clase tal como aparecen en el encabezado del CSV.
+        </div>
+      </div>
+
+      <div class="form-section hidden" id="arbolSection">
+        <label class="required">Columna objetivo (a predecir):</label>
+        <input type="text" name="target_col" id="target_col" placeholder="Ej: contrato">
+        <span class="help-text">Escribe el nombre exacto de la columna que quiere predecir.</span>
+
+        <label>Criterio de división:</label>
+        <select name="criterio" id="criterio">
+          <option value="gini">Gini</option>
+          <option value="entropy">Entropía</option>
+        </select>
+
+        <label>Profundidad máxima (1-5):</label>
+        <input type="number" name="profundidad_max" id="max_depth" min="1" max="5" placeholder="Ej: 3">
+        <span class="help-text">Deja vacío para una profundidad máxima de 4</span>
+        <span class="help-text">
+          Debe estar entre 1 y 5. Si lo dejas vacío se usa 4.
+        </span>
+
+        <label>Tamaño del conjunto de prueba (0.1-0.9):</label>
+        <input type="number" step="0.05" name="prueba" id="test_size" min="0.1" max="0.9" placeholder="0.3">
+        <span class="help-text">Deja vacío para usar 0.3 (30%)</span>
+      </div>
+
+      <button type="submit">Ejecutar Algoritmo</button>
+    </form>
+    </div>
+      <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
